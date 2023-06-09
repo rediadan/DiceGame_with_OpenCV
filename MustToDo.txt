@@ -1,0 +1,24 @@
+필요한 기능들
+    1. opencv_cam 파일과 diceOpenCV2 파일 내용 병합 또는 기능 통합 필요.
+    2. yazzieGame과 RPS 기능 연동 필요.
+    3. diceOpenCV2 주사위 내용들 출력 필요.
+    4. diceOpenCV2 인식된 수 안정화 필요.
+    5. yazzieGame 완성 필요.
+    6. opencv_cam 파일 또는 병합본 파일에 opencv의 keyboard input 클래스 또는 함수를 만들어야 함.
+
+opencv 이용한 파일이 3개나 있으니 모두 연동 또는 통합 필요
+    1. status 변수를 통한 현재 게임 진행 모드를 제어 (추천)
+    2. 모두 한번에 실행되게 하고 필요할때만 값 추출
+    3. 항상 실행되는 파일을 하나 만들고 다른 파일 실행시마다 창이 새로 뜨게 함(비추천)
+
+
+Readme.md 파일 내용 추가 필요
+
+위 사항들에 대한 자세한 설명은 06/10(토) 논의
+
+
+
+
+
+opencv waitkey function-
+https://stackoverflow.com/questions/14494101/using-other-keys-for-the-waitkey-function-of-opencv

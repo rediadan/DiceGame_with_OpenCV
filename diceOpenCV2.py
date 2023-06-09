@@ -9,6 +9,7 @@ params.minInertiaRatio = 0.6
 
 detector = cv2.SimpleBlobDetector_create(params)
 
+epss = 20
 
 def get_blobs(frame):
     frame_blurred = cv2.medianBlur(frame, 7)
@@ -31,7 +32,7 @@ def get_dice_from_blobs(blobs):
 
     if len(X) > 0:
         # Important to set min_sample to 0, as a dice may only have one dot
-        clustering = cluster.DBSCAN(eps=0.01, min_samples=1).fit(X)
+        clustering = cluster.DBSCAN(eps=epss, min_samples=1).fit(X)
 
         # Find the largest label assigned + 1, that's the number of dice found
         num_dice = max(clustering.labels_) + 1
@@ -86,13 +87,20 @@ while(True):
     dice = get_dice_from_blobs(blobs)
     out_frame = overlay_info(frame, dice, blobs)
 
+    cv2.putText(frame, "Min distance between dots: "+str(epss), (1,10),cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1)
+
     cv2.imshow("frame", frame)
+
 
     res = cv2.waitKey(1)
 
     # Stop if the user presses "q"
     if res & 0xFF == ord('q'):
         break
+    if res & 0xFF == ord('w'):
+        epss+=1
+    if res & 0xFF == ord('s'):
+        epss-=1
 
 # When everything is done, release the capture
 cap.release()
