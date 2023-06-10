@@ -1,6 +1,12 @@
 import cv2
 import time
 
+p1 = "[player1] 3 4 5 6 7 8 total"
+p2 = "[player2] 3 4 5 6 7 8 total"
+
+result1 = '\n'.join(p1.split())
+result2 = '\n'.join(p2.split())
+
 # Status는 3개의 상태가 존재합니다.
 # 1. default 기본 상태 입니다. 현재 점수와 상태 등 을 알 수 있습니다.
 # 2. rsp 가위바위보 인식 동작 상태 입니다. 가위바위보를 인식 합니다.
@@ -21,10 +27,19 @@ def defaultStatus():
         font_scale = 1  # 폰트 크기
         color = (0, 255, 0)  # 색
         thickness = 2  # 두께
-        cv2.putText(frame, text, position, font, font_scale, color, thickness)
-        cv2.imshow('카메라', frame)
 
+        lines1 = result1.split('\n')
+        lines2 = result2.split('\n')
 
+        for i, line in enumerate(lines1):
+            position = (50, 50 + i * 50)
+            cv2.putText(frame, line, position, font, font_scale, color, thickness)
+
+        for i, line in enumerate(lines2):
+            position = (1100, 50 + i * 50)
+            cv2.putText(frame, line, position, font, font_scale, color, thickness)
+
+        cv2.imshow('Camera', frame)
 
 while True:
        
