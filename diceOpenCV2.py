@@ -9,7 +9,9 @@ params.minInertiaRatio = 0.6
 
 detector = cv2.SimpleBlobDetector_create(params)
 
+frameCheck = 0
 epss = 20
+prev_arr = []
 
 def get_blobs(frame):
     frame_blurred = cv2.medianBlur(frame, 7)
@@ -76,10 +78,10 @@ def overlay_info(frame, dice, blobs):
 
 # Initialize a video feed
 cap = cv2.VideoCapture(0)
+displayed = False
+def diceStatus():
 
-
-while(True):
-    # Grab the latest image from the video feed
+   # Grab the latest image from the video feed
     ret, frame = cap.read()
 
     # We'll define these later
@@ -91,7 +93,30 @@ while(True):
 
     cv2.imshow("frame", frame)
 
+    arr = []
+    for d in dice:
+        arr.append(d[0])
 
+    
+    return arr
+        
+
+
+while(True):
+    frameCheck += 1
+    
+
+    NewArr = diceStatus()
+    if frameCheck >= 50:
+        frameCheck = 0
+        if not(len(NewArr) == 0):
+            print(NewArr, prev_arr)
+            if(NewArr == prev_arr):
+                print(NewArr)
+                break
+            else:
+                prev_arr = NewArr
+            
     res = cv2.waitKey(1)
 
     # Stop if the user presses "q"
