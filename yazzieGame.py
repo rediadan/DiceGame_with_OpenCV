@@ -10,6 +10,7 @@ class yazzieGameclass:
     #생성자 함수 입니다. 생성시 변수를 초기화 합니다.
     def __init__(self):
         self.playerAmount = 2
+        self.playerArray = []
         os.system("cls")
         self.score = 0
         self.dice = []
@@ -82,6 +83,21 @@ class yazzieGameclass:
     def SetRPS(self):
         #가위바위보를 하는 함수를 여기에 넣어주세요----------------
         print("RPS")
+        return True
+
+
+    def SetTask(self):
+        rpsResult = self.SetRPS()
+        if rpsResult:
+            self.playerArray.append("Player1")
+            self.playerArray.append("Player2")
+        else:
+            self.playerArray.append("Player2")
+            self.playerArray.append("Player1")
+            
+    
+
+
     
 
 # while (True):
