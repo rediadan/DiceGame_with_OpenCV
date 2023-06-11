@@ -6,11 +6,8 @@ import numpy as np
 class rpsClass:
     def __init__(self):
         self.max_num_hands = 2
-        self.gesture = {
-            0:'fist', 1:'one', 2:'two', 3:'three', 4:'four', 5:'five',
-            6:'six', 7:'rock', 8:'spiderman', 9:'yeah', 10:'ok',
-        }
-        self.rps_gesture = {0:'rock', 5:'paper', 9:'scissors'}
+        
+        self.rps_gesture = {0:'rock', 1:'paper', 2:'scissors'}
 
         self.mp_hands = mp.solutions.hands
         self.mp_drawing = mp.solutions.drawing_utils
@@ -19,7 +16,7 @@ class rpsClass:
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5)
 
-        file = np.genfromtxt("RPS/gesture_train.csv", delimiter=',')
+        file = np.genfromtxt("C:/가위바위보/RPS/gesture_train.csv", delimiter=',')
         angle = file[:, :-1].astype(np.float32)
         label = file[:, -1].astype(np.float32)
 
