@@ -16,7 +16,7 @@ class rpsClass:
             min_detection_confidence=0.5,
             min_tracking_confidence=0.5)
 
-        file = np.genfromtxt("C:/가위바위보/RPS/gesture_train.csv", delimiter=',')
+        file = np.genfromtxt("RPS\gesture_train.csv", delimiter=',')
         angle = file[:, :-1].astype(np.float32)
         label = file[:, -1].astype(np.float32)
 
