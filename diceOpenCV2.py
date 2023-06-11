@@ -2,131 +2,138 @@ import cv2
 import numpy as np
 from sklearn import cluster
 
-params = cv2.SimpleBlobDetector_Params()
+class diceDetector:
+    def __init__(self):
+        self.params = cv2.SimpleBlobDetector_Params()
 
-params.filterByInertia
-params.minInertiaRatio = 0.6
+        self.params.filterByInertia
+        self.params.minInertiaRatio = 0.6
 
-detector = cv2.SimpleBlobDetector_create(params)
+        self.detector = cv2.SimpleBlobDetector_create(self.params)
 
-frameCheck = 0
-epss = 20
-prev_arr = []
+        self.frameCheck = 0
+        self.epss = 40
+        self.prev_arr = []
 
-def get_blobs(frame):
-    frame_blurred = cv2.medianBlur(frame, 7)
-    frame_gray = cv2.cvtColor(frame_blurred, cv2.COLOR_BGR2GRAY)
-    blobs = detector.detect(frame_gray)
+    def get_blobs(self, frame):
+        self.frame_blurred = cv2.medianBlur(frame, 7)
+        self.frame_gray = cv2.cvtColor(self.frame_blurred, cv2.COLOR_BGR2GRAY)
+        self.blobs = self.detector.detect(self.frame_gray)
 
-    return blobs
-
-
-def get_dice_from_blobs(blobs):
-    # Get centroids of all blobs
-    X = []
-    for b in blobs:
-        pos = b.pt
-
-        if pos != None:
-            X.append(pos)
-
-    X = np.asarray(X)
-
-    if len(X) > 0:
-        # Important to set min_sample to 0, as a dice may only have one dot
-        clustering = cluster.DBSCAN(eps=epss, min_samples=1).fit(X)
-
-        # Find the largest label assigned + 1, that's the number of dice found
-        num_dice = max(clustering.labels_) + 1
-
-        dice = []
-
-        # Calculate centroid of each dice, the average between all a dice's dots
-        for i in range(num_dice):
-            X_dice = X[clustering.labels_ == i]
-
-            centroid_dice = np.mean(X_dice, axis=0)
-
-            dice.append([len(X_dice), *centroid_dice])
-
-        return dice
-
-    else:
-        return []
+        return self.blobs
 
 
-def overlay_info(frame, dice, blobs):
-    # Overlay blobs
-    for b in blobs:
-        pos = b.pt
-        r = b.size / 2
+    def get_dice_from_blobs(self, blobs):
+        # Get centroids of all blobs
+        X = []
+        for b in blobs:
+            pos = b.pt
 
-        cv2.circle(frame, (int(pos[0]), int(pos[1])),
-                   int(r), (255, 0, 0), 2)
+            if pos != None:
+                X.append(pos)
 
-    # Overlay dice number
-    for d in dice:
-        # Get textsize for text centering
-        textsize = cv2.getTextSize(
-            str(d[0]), cv2.FONT_HERSHEY_PLAIN, 3, 2)[0]
+        X = np.asarray(X)
 
-        cv2.putText(frame, str(d[0]),
-                    (int(d[1] - textsize[0] / 2),
-                     int(d[2] + textsize[1] / 2)),
-                    cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 2)
+        if len(X) > 0:
+            # Important to set min_sample to 0, as a dice may only have one dot
+            clustering = cluster.DBSCAN(eps=self.epss, min_samples=1).fit(X)
+
+            # Find the largest label assigned + 1, that's the number of dice found
+            num_dice = max(clustering.labels_) + 1
+
+            dice = []
+
+            # Calculate centroid of each dice, the average between all a dice's dots
+            for i in range(num_dice):
+                X_dice = X[clustering.labels_ == i]
+
+                centroid_dice = np.mean(X_dice, axis=0)
+
+                dice.append([len(X_dice), *centroid_dice])
+
+            return dice
+
+        else:
+            return []
 
 
-# Initialize a video feed
-cap = cv2.VideoCapture(0)
-displayed = False
-def diceStatus():
+    def overlay_info(self, frame, dice, blobs):
+        # Overlay blobs
+        for b in blobs:
+            pos = b.pt
+            r = b.size / 2
 
-   # Grab the latest image from the video feed
-    ret, frame = cap.read()
+            cv2.circle(frame, (int(pos[0]), int(pos[1])),
+                    int(r), (255, 0, 0), 2)
 
-    # We'll define these later
-    blobs = get_blobs(frame)
-    dice = get_dice_from_blobs(blobs)
-    out_frame = overlay_info(frame, dice, blobs)
+        # Overlay dice number
+        for d in dice:
+            # Get textsize for text centering
+            textsize = cv2.getTextSize(
+                str(d[0]), cv2.FONT_HERSHEY_PLAIN, 3, 2)[0]
 
-    cv2.putText(frame, "Min distance between dots: "+str(epss), (1,10),cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1)
+            cv2.putText(frame, str(d[0]),
+                        (int(d[1] - textsize[0] / 2),
+                        int(d[2] + textsize[1] / 2)),
+                        cv2.FONT_HERSHEY_PLAIN, 3, (0, 255, 0), 2)
 
-    cv2.imshow("frame", frame)
 
-    arr = []
-    for d in dice:
-        arr.append(d[0])
+    def diceStatus(self, cap):
 
-    
-    return arr
+        # Grab the latest image from the video feed
+        ret, frame = cap.read()
+        frame = cv2.flip(frame, 1)
+        # We'll define these later
+        blobs = self.get_blobs(frame)
+        dice = self.get_dice_from_blobs(blobs)
+        out_frame = self.overlay_info(frame, dice, blobs)
+
         
 
+        
 
-while(True):
-    frameCheck += 1
+        arr = []
+        for d in dice:
+            arr.append(int(d[0]))
+
+        return frame, arr
+        
+    def RunDiceCV(self, cap):
+        self.frameCheck += 1
     
 
-    NewArr = diceStatus()
-    if frameCheck >= 50:
-        frameCheck = 0
-        if not(len(NewArr) == 0):
-            print(NewArr, prev_arr)
-            if(NewArr == prev_arr):
-                print(NewArr)
-                break
-            else:
-                prev_arr = NewArr
-            
-    res = cv2.waitKey(1)
+        Final, arr = self.diceStatus(cap)
+        
+        if self.frameCheck >= 10:
+            self.frameCheck = 0
+            if not(len(arr) == 0):
+                if(arr == self.prev_arr):
+                    print(arr)
+                    return Final, arr, True
+                else:
+                    self.prev_arr = arr
+                    return Final, None, True
+        return Final, None, False
 
-    # Stop if the user presses "q"
-    if res & 0xFF == ord('q'):
-        break
-    if res & 0xFF == ord('w'):
-        epss+=1
-    if res & 0xFF == ord('s'):
-        epss-=1
 
-# When everything is done, release the capture
-cap.release()
-cv2.destroyAllWindows()
+    def SettingDice(self, cap):
+        # Grab the latest image from the video feed
+        ret, frame = cap.read()
+        frame = cv2.flip(frame, 1)
+        # We'll define these later
+        blobs = self.get_blobs(frame)
+        dice = self.get_dice_from_blobs(blobs)
+        out_frame = self.overlay_info(frame, dice, blobs)
+
+        cv2.putText(frame, "Min distance between dots: "+str(self.epss), (1,10),cv2.FONT_HERSHEY_PLAIN, 1, (0, 255, 0), 1)
+        return frame
+
+
+    def diceKey(self, res):
+        if res & 0xFF == ord('w'):
+            self.epss+=1
+        if res & 0xFF == ord('s'):
+            self.epss-=1
+
+    
+
