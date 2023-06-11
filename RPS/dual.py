@@ -2,6 +2,7 @@ import cv2
 import mediapipe as mp
 import numpy as np
 
+# 가위바위보 함수를 사용하기 위해 클래스를 만듦.
 class rpsClass:
     def __init__(self):
         self.max_num_hands = 2
